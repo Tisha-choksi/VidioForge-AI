@@ -18,10 +18,10 @@ Your application should eventually look like this:
               ┌─────────────────────┐
               │   Open Models       │
               │                     │
-              │ Wan 2.x             │
-              │ LTX-Video           │
-              │ FLUX / SDXL         │
-              │ Whisper              │
+              │     Wan 2.x         │
+              │    LTX-Video        │
+              │    FLUX / SDXL      │
+              │    Whisper          │
               └─────────────────────┘
                          ↓
                     GPU Worker
@@ -270,9 +270,22 @@ You pay for the server/GPU infrastructure, but **not per video/API credit**.
 
 ---
 
-### Option C — Free cloud notebooks
+### Option C — Free cloud notebooks ✅ (chosen for Phases 1–2)
 
-You can experiment with services such as free notebook environments when GPU availability permits.
+Free notebook services give you a real NVIDIA GPU in the cloud at no cost.
+
+This is how this project starts, because the laptop GPU is too small (see section 8).
+
+| Service | GPU | Limits (check current) | Use |
+|---|---|---|---|
+| **Kaggle** (primary) | T4 16 GB (or 2× T4 / P100) | ~30 GPU hours/week, sessions up to ~12 h, ~30 GB RAM | Phase 1–2 experiments |
+| **Google Colab** (backup) | T4 16 GB | Session limits vary, ~12 GB RAM, GPU not always available | When Kaggle quota runs out |
+
+Tips:
+
+- Kaggle needs phone verification before you can turn on GPU and internet.
+- Sessions are temporary: models download again every session unless you save them as a Kaggle Dataset.
+- Download generated MP4s before the session ends.
 
 But I **wouldn't design the final platform around free notebook sessions** because sessions can have:
 
@@ -282,11 +295,34 @@ But I **wouldn't design the final platform around free notebook sessions** becau
 - storage limits
 - changing policies
 
-Use them for learning/testing, not as the foundation of an "unlimited" service.
+Use them for learning/testing (Phases 1–2), not as the foundation of an "unlimited" service.
 
 ---
 
 # 8. Hardware recommendation
+
+### Current hardware (checked 2026-10-08)
+
+| | This laptop | Needed for Wan |
+|---|---|---|
+| GPU | GTX 1650, 4 GB VRAM | 8 GB minimum, 16–24 GB for good results |
+| RAM | 20 GB usable | OK |
+| CPU | Ryzen 5 5600H | OK |
+| Disk | C: is tight, D: has ~143 GB free | Keep models and projects on D: |
+
+The laptop GPU is too small for video generation (and a laptop GPU can't be upgraded), so:
+
+```text
+Phases 1–2  (AI model testing)              → Kaggle / Colab free GPU
+Phases 3–7  (API, queue, website, DB, tools) → this laptop, with a fake generator
+Real GPU for the finished app               → decide after Phase 5
+```
+
+For the finished app, choose between:
+
+- renting a cloud GPU by the hour (RunPod, Vast.ai, E2E Networks)
+- a serverless GPU that charges only while a video is generating (Modal, RunPod Serverless)
+- buying a desktop GPU with 16–24 GB VRAM
 
 For your first prototype, don't immediately buy an expensive GPU.
 
@@ -868,7 +904,7 @@ I'd make the main studio look approximately like:
 │                                              │
 │  Upload Image                                │
 │  ┌────────────────────────────────────────┐  │
-│  │      Drag image here                  │  │
+│  │      Drag image here                   │  │
 │  └────────────────────────────────────────┘  │
 │                                              │
 │  Model       Wan                             │
@@ -881,7 +917,7 @@ I'd make the main studio look approximately like:
 ├──────────────────────────────────────────────┤
 │  GENERATION                                  │
 │                                              │
-│  ████████████████░░░░ 72%                    │
+│  ████████████████░░░░░░ 72%                  │
 │                                              │
 │  Your video is being generated...            │
 └──────────────────────────────────────────────┘
@@ -1092,6 +1128,8 @@ Video
 
 **No frontend yet.**
 
+Where: **Kaggle free GPU** (Colab as backup). Start with the small Wan text-to-video model (Wan 2.1 T2V 1.3B, 480p), which fits easily in 16 GB.
+
 ---
 
 # 🟢 Phase 2 — Image → Video
@@ -1112,6 +1150,8 @@ Goal:
 
 Generate a stable 5-second clip from an image.
 
+Where: **Kaggle free GPU**. Image-to-video models are bigger than the 1.3B text-to-video model, so use a quantized (GGUF) version that fits in 16 GB.
+
 ---
 
 # 🟢 Phase 3 — FastAPI
@@ -1127,6 +1167,8 @@ GET /jobs/{id}
 Goal:
 
 Control your AI engine through HTTP.
+
+Where: **this laptop**, from here through Phase 7. Use a fake generator that returns a sample MP4, so the API, queue, website and database can be built without a GPU. Test real generation on a notebook or rented GPU.
 
 ---
 
@@ -1163,6 +1205,8 @@ Download
 Goal:
 
 A complete usable application.
+
+Then: choose the GPU for real use (see section 8): rent by the hour, serverless, or buy a 16–24 GB GPU.
 
 ---
 
@@ -1353,7 +1397,7 @@ I'd target this:
 | Speech-to-text | Whisper |
 | TTS | Local open-source TTS |
 | Containers | Docker |
-| GPU | NVIDIA CUDA |
+| GPU | NVIDIA CUDA (Kaggle/Colab for learning → rented or own GPU for production) |
 | Storage | Local → S3-compatible |
 | CI/CD | GitHub Actions |
 | Monitoring | Prometheus/Grafana later |
@@ -1408,13 +1452,13 @@ Eventually your project could become:
 ║              AI VIDEO STUDIO                 ║
 ╠══════════════════════════════════════════════╣
 ║                                              ║
-║  ✨ Text → Video                             ║
-║  🖼️ Image → Video                            ║
-║  🎬 Video → Video                            ║
-║  🎨 Text → Image                             ║
+║  ✨ Text → Video                            ║
+║  🖼️ Image → Video                           ║
+║  🎬 Video → Video                           ║
+║  🎨 Text → Image                            ║
 ║  🎙️ AI Voice                                ║
-║  📝 Auto Subtitles                           ║
-║  🎵 Background Music                         ║
+║  📝 Auto Subtitles                          ║
+║  🎵 Background Music                        ║
 ║  🎞️ AI Reel Generator                       ║
 ║                                              ║
 ║  ──────────────────────────────────────────  ║
@@ -1432,8 +1476,10 @@ Eventually your project could become:
 Don't start with the website.
 Start with:
 
-**`Wan → ComfyUI → NVIDIA GPU → generate one 5-second video locally.`**
+**`Wan → ComfyUI → free Kaggle GPU → generate one 5-second video.`**
 
 Once that works, everything else—FastAPI, Redis, Next.js, PostgreSQL, Docker, MLOps—is built around that working inference engine.
 
-And because you want **free models + unlimited generation**, the next step should be choosing the **exact model version and GPU setup based on your computer's RAM/VRAM** before we write any code.
+The GPU setup is decided (see sections 7 and 8): the laptop's 4 GB GPU is too small, so model testing happens on free Kaggle/Colab notebooks and the rest of the app is built on the laptop.
+
+Next step: a Kaggle notebook that installs ComfyUI, downloads Wan 2.1 T2V 1.3B and generates the first clip.
