@@ -34,9 +34,7 @@ Your application should eventually look like this:
 ---
 
 # 2. Your two main features
-
 ## A. Text → Video
-
 User enters:
 
 > A beautiful Indian bride walking through a palace, cinematic lighting, slow camera movement, realistic photography.
