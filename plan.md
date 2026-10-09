@@ -1150,7 +1150,7 @@ Goal:
 
 Generate a stable 5-second clip from an image.
 
-Where: **Kaggle free GPU**. Image-to-video models are bigger than the 1.3B text-to-video model, so use a quantized (GGUF) version that fits in 16 GB.
+Where: **Kaggle free GPU**, with **Wan 2.2 TI2V 5B**: one model for both text→video and image→video, 10 GB, so it fits a 16 GB T4 at full quality. The 14B image-to-video models are 14–33 GB and far too slow on a T4. Notebook: `ai/notebooks/phase2_image_to_video_kaggle.ipynb`.
 
 ---
 
